@@ -33,15 +33,6 @@ their perception in cluttered or obstructed environments.
 <!--more-->
 {: class="table-of-content"}
 * TOC
-Introduction
-Prior Works
-Problem Formulation
-Proposed Methods and Evaluation
-Experiments
-Results
-Discussion
-Conclusion
-References
 {:toc}
 
 ## Introduction
@@ -50,8 +41,7 @@ with visual perception capabilities must be able to adapt their
 viewpoints to maintain visibility of target objects, even when
 occlusions or obstacles obstruct their line of sight. Traditional
 robotic vision systems often address this requirement by either
-using a large array of static sensors, usually cameras
-, pointing in different orientations, or by moving a single
+using a large array of static sensors, usually cameras, pointing in different orientations, or by moving a single
 sensor in a predetermined path. Both approaches have their
 downsides. Arrays of static sensors are far more expensive than
 using a single sensor, and rely on the motion of their agent
@@ -63,8 +53,7 @@ the advancement of vision-based robotics. Active Vision is a
 promising field that aims to address these challenges. The goal
 of Active Vision is to mimic the way that humans perceive
 their environment: by learning to move and orient a single
-sensor in ways that capture information important for com-
-pleting some task. 
+sensor in ways that capture information important for completing some task. 
 
 Active Vision avoids the shortcomings of
 the other two approaches; the agent uses a single controllable
@@ -83,8 +72,7 @@ locate objects but also to continuously adjust its position
 to avoid occlusions and improve object visibility. However,
 developing such an RL framework requires overcoming several
 challenges, including creating a robust training environment
-that mimics the need to shift camera perspectives, and engi-
-neering reward functions that incentivize behavior promoting
+that mimics the need to shift camera perspectives, and engineering reward functions that incentivize behavior promoting
 consistent visibility.
 
 We propose Peekaboo, an approach that addresses many
@@ -92,9 +80,7 @@ of the shortcomings of previous methods. Peekaboo's key
 insight is that the Localization and Task Completion steps in
 manipulation tasks can be decoupled with minimal loss of
 generality. In practice, when humans perform manipulation
-tasks, we search our environment for an object before ex-
-tending a hand in its direction to grasp it. The same logic
-applies here. Any manipulation task first requires the agent
+tasks, we search our environment for an object before extending a hand in its direction to grasp it. The same logic applies here. Any manipulation task first requires the agent
 to localize the object, along with anything else critical for
 completing the task. Peekaboo focuses on this Localization
 step, but unlike previous works is designed to be robust to
@@ -113,12 +99,10 @@ researchers demonstrate that learning a general approach to
 navigation from sources using different embodiments is key
 to performing manipulation tasks. Their findings reinforce the
 notion that navigation is a robotics control primitive that can
-aid any task, even those that do not explicitly perform naviga-
-tion. Other works like those by researchers from the Univer-
-sity of Texas at Austin have proposed performing complex
-tasks using an "information-seeking" and an "information-
-receiving" policy to guide the search task and manipulation
-task separately [3]. While impressive, their approach Learning
+aid any task, even those that do not explicitly perform navigation. 
+
+Other works like those by researchers from the University of Texas at Austin have proposed performing complex
+tasks using an "information-seeking" and an "information-receiving" policy to guide the search task and manipulation task separately [3]. While impressive, their approach Learning
 to Look is designed to perform complex manipulation tasks in
 simple unobstructed environments with limited camera motion.
 In contrast, our goal is to operate in environments designed to
@@ -130,13 +114,15 @@ well-studied tasks like grasping [6] and object classification
 learning Active Vision policies from human demonstrations
 using Imitation Learning. Ian Chuang et al. propose a method
 that allows a human teleoperator to control both a camera and
-a robotic arm in a VR environment in order to collect near-
-optimal human demonstration data of Active Vision tasks like
-inserting a key into a lock.
+a robotic arm in a VR environment in order to collect near-optimal human demonstration data of Active Vision tasks like inserting a key into a lock.
+
+<div style="text-align: center;">
+  <img src="{{ '/assets/images/group45/pworksfig1.png' | relative_url }}" style="width: 500px; max-width: 100%;" alt="RobosuiteEnv">
+  <p><em>Using learned Active Vision policies as a method to acquire novel views of objects to aid in object classification.</em></p>
+</div>
 
 Two prior works stand out as particularly similar to our task
-and deserve additional attention. The first approach by Stan-
-ford researchers, DREAM, proposes decoupling their agent's
+and deserve additional attention. The first approach by Stanford researchers, DREAM, proposes decoupling their agent's
 task into an explorative navigation step and exploitative task
 completion stage, each of which is learned separately [5]. This
 approach relies on an intrinsic task ID, and leverages memory
@@ -150,7 +136,9 @@ contrast, our approach freely manipulates the agent in six
 degrees of freedom. In addition, their task is designed such
 that the agent can physically access the entire environment:
 an assumption that is often not true in physical systems in the
-real world. Another highly relevant paper from researchers
+real world. 
+
+Another highly relevant paper from researchers
 at Carnegie Mellon uses Active Vision to aid a manipulation
 task in the presence of visual occlusions [1]. The authors
 propose a task of pushing a target cube onto a target coordinate
@@ -164,6 +152,11 @@ Lastly, the authors learn a single policy that jointly manipulates
 the robotic arm and controls the camera -- a process we
 believe can be decoupled.
 
+<div style="text-align: center;">
+  <img src="{{ '/assets/images/group45/pworks2.png' | relative_url }}" style="width: 500px; max-width: 100%;" alt="RobosuiteEnv">
+  <p><em>Learning to perform manipulation in the presence of visual occlusions by learning to control the camera. The agent jointly learns to control the robotic arm to move the cube onto the target, and control the camera to avoid visual obstructions.</em></p>
+</div>
+
 ## Problem Formulation
 
 We contribute a novel task formulation unique to Peekaboo,
@@ -171,6 +164,11 @@ and central to performing occlusion-aware search. We train
 Peekaboo using a Reinforcement Learning framework, which
 requires us to define three components: the environment, the
 agent, and the reward function.
+
+<div style="text-align: center;">
+  <img src="{{ '/assets/images/group45/mdp.png' | relative_url }}" style="width: 500px; max-width: 100%;" alt="RobosuiteEnv">
+  <p><em>Markov Decision Process (MDP) Framework</em></p>
+</div>
 
 The environment is a simple indoor room, containing a
 central table. On the table lies a randomly positioned target
@@ -197,21 +195,22 @@ autonomously determine the optimal perspectives for tracking
 objects, particularly in environments where occlusions are
 frequent. To achieve this, we will:
 
-1) Introduce randomness in both the environment and
-camera settings during the training phase, ensuring the
-model's robustness to variable conditions.
+1. **Introduce randomness**  
+   - Randomize both the environment and camera settings during the training phase.  
+   - Ensure the model is robust to variable conditions.  
 
-2) Include a vision encoder to process incoming visual data.
+2. **Include a vision encoder**  
+   - Process incoming visual data effectively.  
 
-3) Incorporate an RL algorithm that trains the camera's
-decision-making process
+3. **Incorporate a reinforcement learning (RL) algorithm**  
+   - Train the camera’s decision-making process.  
 
-4) Engineer a reward function that emphasizes maintaining
-clear sightlines and avoiding occlusions.
+4. **Engineer a reward function**  
+   - Emphasize maintaining clear sightlines.  
+   - Penalize occlusions to improve performance.  
 
 This work contributes to the growing field of adaptive
-robotic vision, offering a method for giving robots au-
-tonomous, context-aware vision capabilities that can support
+robotic vision, offering a method for giving robots autonomous, context-aware vision capabilities that can support
 applications requiring real-time adaptability in unpredictable
 environments.
 
@@ -239,8 +238,7 @@ In its initial frame observation of the environment, the robot
 will not be able to see the cube it is trying to lift, as it will be
 covered by the wall. We also introduced cube randomization,
 camera randomization, and arm randomization. The cube and
-arm randomization was done through the Robosuite frame-
-work. The camera and wall randomization relied on custom
+arm randomization was done through the Robosuite framework. The camera and wall randomization relied on custom
 quaternions that changed the orientation of our objects. The
 goal of the overall task is for the robot to search for the cube,
 find it behind the wall, and then lift it.
@@ -269,6 +267,26 @@ $$
 
 
 If the cube is in view, we get a reward of 1, and if it is not, the reward is 0. We will implement this in the environment using the ground truth proprioceptive data of the robotic arm, the wall, and the cube. Using this position data, we can calculate the angle in between the robotic arm and wall, and the robotic arm and the cube. These angles can then indicate if the wall is blocking the robotic arm's frame of view from the cube or not, which allows us to return a reward of 0 or 1. Given that the robot does not have access to this ground truth data, we are essentially teaching the robot to recognize and search around occlusions when they show up prominently in its camera frame. 
+
+Here is a snippet from our code:
+```
+def reward(obs):
+    target_vertices, wall_vertices, camera_position, camera_vec, camera_bloom = preprocess(obs)
+
+    # if any corner of the target cube is outside of frame, return 0
+    for target_vertex in target_vertices:
+        if not target_visible_in_conical_bloom(target_vertex, camera_position, camera_vec, camera_bloom):
+            return 0
+
+    # if any corner of the target cube is blocked by the wall, return 0
+    for target_vertex in target_vertices:
+        for wall_plane in wall_vertices:
+            if line_segment_intersects_truncated_plane(target_vertex, camera_position, wall_plane):
+                return 0
+        
+    # cube is entirely within bloom and is not obstructed
+    return 1
+```
 
 Once we have set up the Robosuite environment with the camera and reward function, we will train a PPO agent on the MDP formulation of the $$\textit{Localization}$$ stage. The image observations will be processed by a pretrained Vision Encoder, which will be frozen during training. The output features of the Vision Encoder will be the inputs to our RL neural networks. Our evaluation will consist of visualizing rollouts and establishing a success rate for the $$\textit{Localization}$$ phase. A rollout will be considered a success if the object of interest is seen completely unobstructed in the scene from the perspective of the robot. In order to test for generalization, we will randomize initial states of the robotic arm, the wall, and the cube. Sometimes, the cube will be completely in view, and sometimes it will be completely occluded. It will be up to the robot to learn and decide when it needs to search around the wall and when it has the object of interest in sight.
 
@@ -322,14 +340,19 @@ When we tested our model after training, we saw that our policy's actions greatl
 It is also important to note that even though we trained for 10+ hours, that only amounted to 400 episodes, which is not very much compared to other environments that train RL models with training episodes in the thousands. This increase in compute goes back to our problem setup, where we settled on the computationally expensive DinoV2 vision encoder with high resolution images, and set the complexity of our task through drastic randomization of our task environment. In future works, especially with a visually simple task environment (the only objects are a wall and cube, with no visual intricacies) it may have been better to use a smaller Vision Encoder like a ResNet or train our own CNNPolicy with lower resolution images. Additionally, we had hoped that the exploration of RL would allow it to learn to overcome drastic randomization, but through our results it seems that we were potentially wrong. It may have been better to start with no randomization and just a wall occluding a cube, and once that was working, we could incrementally add randomization to increase complexity. Once these changes are implemented, we believe that our solution could be a viable solution to the active exploration problem that we are working on. 
 
 ## Conclusion
-$$\textbf{Summary:}$$ We present Peek-A-Boo, a two stage Reinforcement Learning framework that aims to break down any task into two stages: Localization/Search and Task Completion. We create a custom task environment with occlusions and randomization, an engineered reward function, and train an RL model with a Visual Encoder to complete the Localization stage. Through our model training, we are able to demonstrate promise in our approach through generally increasing rewards despite variability in training performance.
+We present Peek-A-Boo, a two stage Reinforcement Learning framework that aims to break down any task into two stages: Localization/Search and Task Completion. We create a custom task environment with occlusions and randomization, an engineered reward function, and train an RL model with a Visual Encoder to complete the Localization stage. Through our model training, we are able to demonstrate promise in our approach through generally increasing rewards despite variability in training performance.
 
-$$\textbf{Future Work:}$$ Future work would focus on simplifying the task with less drastic randomization to show stable performance. Then, we can scale up to more complicated tasks. Future work could also look into other ways to stabilize the performance of the model. For instance, the Localization stage of our framework could be approached using IBRL (Imitation Bootstrapped Reinforcement Learning) [4] in order to improve stability through Imitation Learning while allowing the model to also explore the environment through RL. Additionally, another avenue of future work could be automating the reward function using object detection or semantic segmentation on the observation image. We have engineering a reward function using ground truth data, but that may not always be available when applying this framework. 
+### Future Work
+Future work would focus on simplifying the task with less drastic randomization to show stable performance. Then, we can scale up to more complicated tasks. Future work could also look into other ways to stabilize the performance of the model. For instance, the Localization stage of our framework could be approached using IBRL (Imitation Bootstrapped Reinforcement Learning) [4] in order to improve stability through Imitation Learning while allowing the model to also explore the environment through RL. Additionally, another avenue of future work could be automating the reward function using object detection or semantic segmentation on the observation image. We have engineering a reward function using ground truth data, but that may not always be available when applying this framework. 
 
 Overall, we see this as a promising first step for active perception and occlusion-aware robotics. We are excited to see the advancements in this field to hopefully one day see robot policies that are able to explore and generalize to any extenuating circumstance that they face in their environment. 
 
-## Code
+## Links
 [Link to our codebase](https://github.com/ophirsim/Peekaboo)
+
+Custom feature extractor using the pretrained DINOv2 base model from timm: [Link](https://github.com/ophirsim/Peekaboo/blob/main/vision_encoder.py)
+
+Stable Baselines Documentation: [Link](https://stable-baselines3.readthedocs.io/en/master/modules/ppo.html)
 
 ## References
 [1] Cheng, R., Agarwal, A., & Fragkiadaki, K.
@@ -339,13 +362,10 @@ Conference on Robot Learning, 422-431.
 http://proceedings.mlr.press/v87/cheng18a/cheng18a.pdf
 
 [2] Chuang, I., Lee, A., Gao, D., & Soltani, I. (2024). Active
-Vision Might Be All You Need: Exploring Active Vi-
-sion in Bimanual Robotic Manipulation. arXiv preprint
+Vision Might Be All You Need: Exploring Active Vision in Bimanual Robotic Manipulation. arXiv preprint
 arXiv:2409.17435.
 
-[3] Dass, S., Hu, J., Abbatematteo, B., Stone, P., & Martin-
-Martin, R. (2024). Learning to Look: Seeking Informa-
-tion for Decision Making via Policy Factorization. arXiv
+[3] Dass, S., Hu, J., Abbatematteo, B., Stone, P., & Martin, R. (2024). Learning to Look: Seeking Information for Decision Making via Policy Factorization. arXiv
 preprint arXiv:2410.18964.
 
 [4] Hu, H., Mirchandani, S., & Sadigh, D. (2024). Imitation
@@ -353,15 +373,11 @@ Bootstrapped Reinforcement Learning. arXiv [Cs.LG].
 Retrieved from http://arxiv.org/abs/2311.02198
 
 [5] Liu, E. Z., Finn, C., Liang, P., & Raghunathan, A.
-(2021, November 12). Decoupling exploration and ex-
-ploitation in meta-reinforcement learning without sac-
-rifices. Exploration in Meta-Reinforcement Learning.
+(2021, November 12). Decoupling exploration and exploitation in meta-reinforcement learning without sacrifices. Exploration in Meta-Reinforcement Learning.
 https://ezliu.github.io/dream/
 
 [6] Natarajan, S., Brown, G., & Calli, B. (2021).
-Aiding Grasp Synthesis for Novel Objects Us-
-ing Heuristic-Based and Data-Driven Active Vi-
-sion Methods. Frontiers in Robotics and AI, 8.
+Aiding Grasp Synthesis for Novel Objects Using Heuristic-Based and Data-Driven Active Vision Methods. Frontiers in Robotics and AI, 8.
 https://doi.org/10.3389/frobt.2021.696587
 
 [7] Safronov, E., Piga, N., Colledanchise, M., &
